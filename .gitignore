@@ -1,0 +1,12 @@
+# Python sanal ortamı
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Yerel SQLite Veritabanı (Arkadaşın çalıştırdığında kendisinde otomatik oluşsun, seninkini ezmesin)
+*.db
+*.sqlite3
+
+# VS Code ayarları
+.vscode/

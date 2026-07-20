@@ -1,5 +1,6 @@
 from sqlmodel import SQLModel, Field, Relationship
 from typing import List, Optional
+from datetime import datetime
 
 
 # 1. Kullanıcı Tablosu
@@ -17,6 +18,7 @@ class Expense(SQLModel, table=True):
     title: str
     amount: float
     category: str
+    date : datetime = Field(default_factory=datetime.utcnow)
 
     # Yabancı Anahtar (Foreign Key): Bu harcama hangi kullanıcıya ait?
     user_id: int = Field(foreign_key="user.id") #user tablosunun id

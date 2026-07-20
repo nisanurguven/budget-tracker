@@ -3,6 +3,7 @@ from database import engine
 from models import User, Expense 
 from security import hash_password
 from sqlmodel import func
+from datetime import datetime, timedelta
 
 def create_user(username:str, email:str, password:str):
 
@@ -123,3 +124,17 @@ def get_expense_summary_by_category(user_id: int):
         results = session.exec(statement).all()
         summary = {category : total for category, total in results}
         return summary
+    
+
+# Son 30 günün harcamalarını çeken fonksiyon
+def get_recent_expenses(user_id: int, days: int = 30):
+    with Session(engine) as session:
+        #Şuanki tarihten 30 gün öncekini çıkarıtoyruz
+        cutoff_date = datetime.utcnow() - timedelta(days=days)
+        
+        #Harcama tarihi 30 gün öncekinden büyük veya eşit olsun
+        statement = select(Expense).where(
+            Expense.user_id == user_id,
+            Expense.date >= cutoff_date 
+        )
+        return session.exec(statement).all()

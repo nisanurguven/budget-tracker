@@ -4,6 +4,10 @@ from security import verify_password, create_access_token, decode_access_token
 import crud
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
+import os 
+from google import genai
+
+
 
 # Yazdığımız FastAPI uygulamasını başlatıyoruz
 app = FastAPI(title="Budget Tracker API", version="1.0")
@@ -173,3 +177,60 @@ def edit_expense(
         )
     return {"status": "Harcamanız başarıyla güncellendi.", "data":updated_expense}
 
+
+
+# API Key'i koda gömmüyoruz, sistem ortam değişkeninden otomatik okuyor:
+client = genai.Client(api_key="AQ.Ab8RN6IxWcVo_mn76rv-D3BF9HYBoSYsMUzTQW_-ItTSMHO9XA")
+
+print("Gemini client oluşturuldu")
+
+@app.post("/ai/advice", tags=["Yapay Zeka Danışmanı"], summary="Kullanıcıya Özel Yapay Zeka Tavsiyesi Al.")
+def get_ai_financial_advice(current_user: dict = Depends(get_current_user)):
+    logged_in_user_id = current_user["user_id"]
+
+    # Son 30 gündeki harcamaları veritabanından çekiyoruz
+    recent_expenses = crud.get_recent_expenses(user_id=logged_in_user_id, days=30)
+
+    if not recent_expenses:
+        return {"advice": "Henüz son 30 güne ait bir harcamanız bulunmamaktadır!"}
+    
+    # Veritabanından gelen karmaşık Python nesnelerini AI'ın anlayabileceği basit bir metin listesine dönüştürüyoruz.
+    expense_list_text = [f"{e.category}: {e.amount} TL ({e.title})" for e in recent_expenses]
+
+    # AI için talimat metnini (Prompt) hazırlıyoruz
+    # Yapay zekaya bir rol veriyoruz (Finansal Danışman) ve elindeki verileri sunuyoruz
+    prompt = f"""
+    Sen "BudgetTracker" uygulamasının resmi kişisel finans danışmanısın.
+    Kullanıcının adı: {current_user['username']}
+
+    Aşağıda kullanıcının son 30 günlük harcama özeti yer almaktadır:
+    {expense_list_text}
+
+    Kurallar:
+    1. Kullanıcıya ismiyle hitap et ve motivasyon edici, samimi bir dil kullan.
+    2. En çok harcama yapılan kategoriyi tespit et ve buna özel 1 somut tasarruf önerisi ver.
+    3. Yanıtın kesinlikle 3 cümleyi ve 100 kelimeyi geçmesin.
+    4. Finansal tavsiye verirken yatırım tavsiyesi vermediğini unutma.
+    """
+
+
+    try:
+        response = client.models.generate_content(
+            model="gemini-3.1-flash-lite",
+            contents=prompt,
+            config={
+                'system_instruction': 'Sen sadece Türkçe konuşan, esprili ve uzman bir finansal analistsin.'
+            }
+        )
+
+        return {
+            "status": "Başarılı",
+            "ai_advice": response.text
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Gemini API hatası: {str(e)}"
+        )
+    

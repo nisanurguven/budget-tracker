@@ -5,7 +5,7 @@ import jwt
 # Bcrypt algoritmasını kullanarak şifreleme motorunu tanımlıyoruz
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-SECRET_KEY = "xknisw1486"
+SECRET_KEY = "9985caaa4f9fb6026070c83e07ba05a3536568c6baea34348cdc612a2a3f234b"
 ALGORITHM = "HS256"
 
 # 1. Düz şifreyi alıp tanınmaz hale getiren fonksiyon

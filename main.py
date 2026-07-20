@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 import os 
 from google import genai
-
+from dotenv import load_dotenv
 
 
 # Yazdığımız FastAPI uygulamasını başlatıyoruz
@@ -178,9 +178,20 @@ def edit_expense(
     return {"status": "Harcamanız başarıyla güncellendi.", "data":updated_expense}
 
 
+# .env dosyasındaki değişkenleri yüklüyoruz
+load_dotenv()
+
+# Ortam değişkeninden API Key'i güvenle çekiyoruz
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+
+# Eğer .env dosyasında anahtar yoksa uygulamanın çökmesini önlemek için kontrol
+if not GEMINI_API_KEY:
+    raise RuntimeError("GEMINI_API_KEY .env dosyasında bulunamadı!")
+
 
 # API Key'i koda gömmüyoruz, sistem ortam değişkeninden otomatik okuyor:
-client = genai.Client(api_key="AQ.Ab8RN6IxWcVo_mn76rv-D3BF9HYBoSYsMUzTQW_-ItTSMHO9XA")
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 print("Gemini client oluşturuldu")
 

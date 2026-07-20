@@ -9,3 +9,6 @@ __pycache__/
 
 # VS Code ayarları
 .vscode/
+
+#API KEY
+.env

@@ -7,7 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 import os 
 from google import genai
 from dotenv import load_dotenv
+from database import engine
 
+SQLModel.metadata.create_all(bind=engine)
 
 # Yazdığımız FastAPI uygulamasını başlatıyoruz
 app = FastAPI(title="Budget Tracker API", version="1.0")
@@ -72,7 +74,8 @@ def add_new_expense(
     title:str,
     amount:float,
     category:str,
-    current_user = Depends(get_current_user)
+    current_user = Depends(get_current_user),
+    date: str = None
     ):
 
     #Giriş yapmış kullanıcının id'sini token üzerinden alıyoruz
@@ -83,7 +86,8 @@ def add_new_expense(
         title=title,
         amount=amount,
         category=category,
-        user_id=logged_in_user_id
+        user_id=logged_in_user_id,
+        date=date
         )
     return {"status": "Harcama Ekleme Başarılı", "data": expense}
 

@@ -1,0 +1,121 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #e0f2fe;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#auth-container {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Kayıt / Giriş Geçiş Linkleri */
+#auth-container a {
+    color: var(--primary, #2563eb);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+#auth-container a:hover {
+    text-decoration: underline;
+}
+
+#dashboard-container {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    width: 100%;
+    max-width: 700px; /* Paneli daha geniş yaptık */
+    display: flex;
+    flex-direction: column;
+    gap: 24px; /* İçindeki bölümler arasında eşit boşluk bırakır */
+}
+
+#ai-container{
+    background-color: #ccd3eb;
+    border-left: 5px solid #324cab;
+    padding: 15px;
+    border-radius: 15px;
+    margin-top: 5px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 15px;
+}
+
+input {
+    width: 100%;
+    margin-top: 6px;
+    margin-bottom: 12px;
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+}
+
+button {
+    background-color: #1e40af;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+button:hover {
+    background-color: #1e3a8a;
+}
+
+#logout-btn {
+    background-color: #ef4444;
+}
+
+#ai-container {
+    background-color: #f0f9ff;
+    border-left: 5px solid #0284c7;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+#ai-advice-result {
+    margin-top: 10px;
+    font-style: italic;
+    color: #0369a1;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    text-align: left;
+}
+
+th, td {
+    padding: 12px 8px;
+}
+
+tr {
+    border-bottom: 1px solid #e2e8f0;
+}

@@ -18,7 +18,7 @@ class Expense(SQLModel, table=True):
     title: str
     amount: float
     category: str
-    date : datetime = Field(default_factory=datetime.utcnow)
+    date: Optional[str] = None
 
     # Yabancı Anahtar (Foreign Key): Bu harcama hangi kullanıcıya ait?
     user_id: int = Field(foreign_key="user.id") #user tablosunun id

@@ -1,14 +1,16 @@
-# Python sanal ortamı
+# Hassas Veriler ve API Anahtarları
+.env
+
+# Python Sanal Ortam ve Derleme Dosyaları
 venv/
 .venv/
 __pycache__/
 *.pyc
 
-# Yerel SQLite Veritabanı
+# Veritabanı Dosyaları
+*.db
 *.sqlite3
 
-# VS Code ayarları
+# IDE ve Editör Klasörleri
 .vscode/
-
-#API KEY
-.env
+.idea/

@@ -32,7 +32,7 @@ def create_user(username:str, email:str, password:str):
             raise e
 
 
-def create_expense(title:str, amount:float, category:str, user_id:int):
+def create_expense(title:str, amount:float, category:str, user_id:int, date: str = None):
     with Session(engine) as session:
         # Expense sınıfından yeni bir harcama nesnesi oluşturuyoruz
         new_expense = Expense(
@@ -40,6 +40,12 @@ def create_expense(title:str, amount:float, category:str, user_id:int):
             amount=amount,
             category=category,
             user_id=user_id)
+
+        new_expense = Expense(title=title, 
+            amount=amount, 
+            category=category, 
+            user_id=user_id, 
+            date=date)
 
         session.add(new_expense)
         session.commit()

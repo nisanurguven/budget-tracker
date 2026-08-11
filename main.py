@@ -8,6 +8,7 @@ import os
 from google import genai
 from dotenv import load_dotenv
 from database import engine
+from google.genai import types
 
 SQLModel.metadata.create_all(bind=engine)
 
@@ -199,6 +200,7 @@ client = genai.Client(api_key=GEMINI_API_KEY)
 
 print("Gemini client oluşturuldu")
 
+
 @app.post("/ai/advice", tags=["Yapay Zeka Danışmanı"], summary="Kullanıcıya Özel Yapay Zeka Tavsiyesi Al.")
 def get_ai_financial_advice(current_user: dict = Depends(get_current_user)):
     logged_in_user_id = current_user["user_id"]
@@ -209,11 +211,10 @@ def get_ai_financial_advice(current_user: dict = Depends(get_current_user)):
     if not recent_expenses:
         return {"ai_advice": "You don't have any recorded expenses in the last 30 days yet!"}
     
-    # Veritabanından gelen karmaşık Python nesnelerini AI'ın anlayabileceği basit bir metin listesine dönüştürüyoruz.
-    expense_list_text = [f"- {e.category}: ${e.amount:.2f} ({e.title})" for e in recent_expenses]
-    # AI için talimat metnini (Prompt) hazırlıyoruz
-    # Yapay zekaya bir rol veriyoruz (Finansal Danışman) ve elindeki verileri sunuyoruz
-    prompt =f"""
+    # Harcamaları USD ($) formatında metne dönüştürüyoruz
+    expense_list_text = "\n".join([f"- {e.category}: ${e.amount:.2f} ({e.title})" for e in recent_expenses])
+
+    prompt = f"""
     You are the official personal finance advisor for the "BudgetTracker" app.
     User's name: {current_user['username']}
 
@@ -227,14 +228,13 @@ def get_ai_financial_advice(current_user: dict = Depends(get_current_user)):
     4. CRITICAL: All monetary figures are strictly in USD ($). Never use TL, EUR, or any other currency symbol.
     """
 
-
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3.5-flash",
             contents=prompt,
-            config={
-                'system_instruction': 'You are an expert personal financial analyst. You communicate strictly in English with a witty and professional tone.'
-            }
+            config=types.GenerateContentConfig(
+                system_instruction="You are an expert personal financial analyst. You communicate strictly in English with a witty and professional tone."
+            )
         )
 
         return {
@@ -247,4 +247,3 @@ def get_ai_financial_advice(current_user: dict = Depends(get_current_user)):
             status_code=500,
             detail=f"Gemini API Error: {str(e)}"
         )
-    

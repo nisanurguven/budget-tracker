@@ -207,34 +207,33 @@ def get_ai_financial_advice(current_user: dict = Depends(get_current_user)):
     recent_expenses = crud.get_recent_expenses(user_id=logged_in_user_id, days=30)
 
     if not recent_expenses:
-        return {"advice": "Henüz son 30 güne ait bir harcamanız bulunmamaktadır!"}
+        return {"ai_advice": "You don't have any recorded expenses in the last 30 days yet!"}
     
     # Veritabanından gelen karmaşık Python nesnelerini AI'ın anlayabileceği basit bir metin listesine dönüştürüyoruz.
-    expense_list_text = [f"{e.category}: {e.amount} TL ({e.title})" for e in recent_expenses]
-
+    expense_list_text = [f"- {e.category}: ${e.amount:.2f} ({e.title})" for e in recent_expenses]
     # AI için talimat metnini (Prompt) hazırlıyoruz
     # Yapay zekaya bir rol veriyoruz (Finansal Danışman) ve elindeki verileri sunuyoruz
-    prompt = f"""
-    Sen "BudgetTracker" uygulamasının resmi kişisel finans danışmanısın.
-    Kullanıcının adı: {current_user['username']}
+    prompt =f"""
+    You are the official personal finance advisor for the "BudgetTracker" app.
+    User's name: {current_user['username']}
 
-    Aşağıda kullanıcının son 30 günlük harcama özeti yer almaktadır:
+    Here is the user's expense summary for the last 30 days:
     {expense_list_text}
 
-    Kurallar:
-    1. Kullanıcıya ismiyle hitap et ve motivasyon edici, samimi bir dil kullan.
-    2. En çok harcama yapılan kategoriyi tespit et ve buna özel 1 somut tasarruf önerisi ver.
-    3. Yanıtın kesinlikle 3 cümleyi ve 100 kelimeyi geçmesin.
-    4. Finansal tavsiye verirken yatırım tavsiyesi vermediğini unutma.
+    Rules:
+    1. Greet the user by their name and use an encouraging, friendly, and professional tone.
+    2. Identify the category with the highest spending and provide 1 practical savings tip.
+    3. Keep your response under 3 sentences and under 100 words.
+    4. CRITICAL: All monetary figures are strictly in USD ($). Never use TL, EUR, or any other currency symbol.
     """
 
 
     try:
         response = client.models.generate_content(
-            model="gemini-3.1-flash-lite",
+            model="gemini-2.5-flash",
             contents=prompt,
             config={
-                'system_instruction': 'Sen sadece Türkçe konuşan, esprili ve uzman bir finansal analistsin.'
+                'system_instruction': 'You are an expert personal financial analyst. You communicate strictly in English with a witty and professional tone.'
             }
         )
 
@@ -246,6 +245,6 @@ def get_ai_financial_advice(current_user: dict = Depends(get_current_user)):
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Gemini API hatası: {str(e)}"
+            detail=f"Gemini API Error: {str(e)}"
         )
     

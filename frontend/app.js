@@ -44,28 +44,30 @@ function checkAuth() {
     const username = localStorage.getItem("username");
 
     if (token) {
-        authContainer.classList.add("hidden");
-        dashboardContainer.classList.remove("hidden");
-        if (username) userNameDisplay.textContent = username;
+        if (authContainer) authContainer.classList.add("hidden");
+        if (dashboardContainer) dashboardContainer.classList.remove("hidden");
+        if (username && userNameDisplay) userNameDisplay.textContent = username;
         loadExpenses();
     } else {
-        authContainer.classList.remove("hidden");
-        dashboardContainer.classList.add("hidden");
+        if (authContainer) authContainer.classList.remove("hidden");
+        if (dashboardContainer) dashboardContainer.classList.add("hidden");
     }
 }
 
-// 2. FORM GEÇİŞLERİ
-if (toRegisterLink && toLoginLink) {
+// 2. FORM GEÇİŞLERİ (Giriş Yap / Kayıt Ol Ekran Geçişleri)
+if (toRegisterLink) {
     toRegisterLink.addEventListener("click", (e) => {
         e.preventDefault();
-        loginForm.classList.add("hidden");
-        registerForm.classList.remove("hidden");
+        if (loginForm) loginForm.classList.add("hidden");
+        if (registerForm) registerForm.classList.remove("hidden");
     });
+}
 
+if (toLoginLink) {
     toLoginLink.addEventListener("click", (e) => {
         e.preventDefault();
-        registerForm.classList.add("hidden");
-        loginForm.classList.remove("hidden");
+        if (registerForm) registerForm.classList.add("hidden");
+        if (loginForm) loginForm.classList.remove("hidden");
     });
 }
 
@@ -81,7 +83,7 @@ if (registerForm) {
                 alert("Registration successful! You can log in now.");
                 registerForm.reset();
                 registerForm.classList.add("hidden");
-                loginForm.classList.remove("hidden");
+                if (loginForm) loginForm.classList.remove("hidden");
             } else {
                 const data = await response.json();
                 alert("Error: " + (data.detail || "Registration failed."));
@@ -176,7 +178,7 @@ function renderFilteredExpenses() {
     if (!expenseListBody) return;
 
     const selectedCat = categoryFilter ? categoryFilter.value : "all";
-    const selectedMonth = monthFilter ? monthFilter.value : ""; // YYYY-MM formatında gelir
+    const selectedMonth = monthFilter ? monthFilter.value : "";
 
     const filtered = allExpenses.filter(e => {
         const matchCategory = (selectedCat === "all" || e.category === selectedCat);
@@ -198,23 +200,23 @@ function renderFilteredExpenses() {
     // Tabloyu Temizle ve Doldur
     expenseListBody.innerHTML = "";
     filtered.forEach(expense => {
-    const rawDate = expense.date || "";
-    const cleanDate = rawDate.includes("T") ? rawDate.split("T")[0] : rawDate;
+        const rawDate = expense.date || "";
+        const cleanDate = rawDate.includes("T") ? rawDate.split("T")[0] : rawDate;
 
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-        <td>${cleanDate || "N/A"}</td>
-        <td>${expense.category}</td>
-        <td>${expense.title}</td>
-        <td>$${Number(expense.amount).toFixed(2)}</td>
-        <td>
-            <button onclick="deleteExpense(${expense.id})" style="background-color: #ef4444; padding: 4px 8px; font-size: 12px; color: white; border: none; border-radius: 4px; cursor: pointer;">Delete</button>
-        </td>
-    `;
-    expenseListBody.appendChild(tr);
-});
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${cleanDate || "N/A"}</td>
+            <td>${expense.category}</td>
+            <td>${expense.title}</td>
+            <td>$${Number(expense.amount).toFixed(2)}</td>
+            <td>
+                <button onclick="deleteExpense(${expense.id})" style="background-color: #ef4444; padding: 4px 8px; font-size: 12px; color: white; border: none; border-radius: 4px; cursor: pointer;">Delete</button>
+            </td>
+        `;
+        expenseListBody.appendChild(tr);
+    });
 
-    // Grafiği Sadece Filtrelenmiş Verilere Göre Çiz
+    // Grafiği Güncelle
     updateExpenseChart(filtered);
 }
 
